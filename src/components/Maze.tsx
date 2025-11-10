@@ -21,6 +21,7 @@ export default function Maze({ grid }: MazeProps) {
   const rows = grid.length
   const columns = grid[0].length
   const totalColumns = columns + 1
+  let i = 0
 
   return (
     <div
@@ -73,13 +74,13 @@ export default function Maze({ grid }: MazeProps) {
           }
 
           const cell = grid[realRow][realColumn]
-
+          if (cell !== 1) i++
           return (
             <div
               key={`${realRow}-${realColumn}`}
               className={`maze-cell ${CELL_CODE_TO_CLASS[cell]}`}
               aria-label={`Celda ${realRow}-${realColumn}`}
-            />
+            >{cell !== 1 ? i - 1 : ""}</div>
           )
         }),
       )}

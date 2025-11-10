@@ -17,7 +17,7 @@ const START_POSITION: Coordinate = { row: 1, col: 0 }
 
 function App() {
   const [maze] = useState<MazeCell[][]>(() => {
-    const generated = agregarTrampas(generarLaberintoKruskalSimple(45, 20), 0.4)
+    const generated = agregarTrampas(generarLaberintoKruskalSimple(35, 15), 0.4)
     const exitRow = generated.length - 2
     const exitCol = generated[0].length - 1
 

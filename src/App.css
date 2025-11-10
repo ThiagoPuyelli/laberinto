@@ -29,20 +29,21 @@ body {
 }
 
 .maze-cell {
-  width: 20px;
+  width: 30px;
   aspect-ratio: 1;
+  font-size: 15px;
   border-radius: 2px;
   transition: transform 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
   color: #101828;
   position: relative;
 }
 
 .maze-cell--empty {
   background: #181818;
+  color: white;
 }
 
 .maze-cell--wall {
@@ -57,7 +58,7 @@ body {
 .maze-cell--trap {
   background: #c62828;
   background:#181818;
-  color: #1f1300;
+  color: white;
 }
 
 .maze-cell--exit {
