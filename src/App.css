@@ -39,6 +39,7 @@ body {
   justify-content: center;
   color: #101828;
   position: relative;
+  cursor: pointer;
 }
 
 .maze-cell--empty {
@@ -58,6 +59,11 @@ body {
 .maze-cell--trap {
   background: #c62828;
   background:#181818;
+  color: white;
+}
+
+.maze-cell--flagged {
+  background: #c62828;
   color: white;
 }
 

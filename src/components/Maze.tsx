@@ -23,6 +23,16 @@ export default function Maze({ grid }: MazeProps) {
   const totalColumns = columns + 1
   let i = 0
 
+  const bandera = (d: HTMLElement) => {
+    if (d.classList.contains('maze-cell--trap') || d.classList.contains('maze-cell--empty')) {
+      if (!d.classList.contains('maze-cell--flagged')) {
+        d.classList.add('maze-cell--flagged')
+      } else {
+        d.classList.remove('maze-cell--flagged')
+      }
+    }
+  }
+
   return (
     <div
       className="maze"
@@ -80,6 +90,7 @@ export default function Maze({ grid }: MazeProps) {
               key={`${realRow}-${realColumn}`}
               className={`maze-cell ${CELL_CODE_TO_CLASS[cell]}`}
               aria-label={`Celda ${realRow}-${realColumn}`}
+              onClick={(e) => bandera(e.currentTarget)}
             >{cell !== 1 ? i - 1 : ""}</div>
           )
         }),

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import laberinto from './laberintos/2.json'
 import './App.css'
 import Maze from './components/Maze'
 import {
@@ -17,7 +18,8 @@ const START_POSITION: Coordinate = { row: 1, col: 0 }
 
 function App() {
   const [maze] = useState<MazeCell[][]>(() => {
-    const generated = agregarTrampas(generarLaberintoKruskalSimple(35, 15), 0.4)
+    //return laberinto.laberinto as MazeCell[][]
+    const generated = agregarTrampas(generarLaberintoKruskalSimple(30, 15), 0.4)
     const exitRow = generated.length - 2
     const exitCol = generated[0].length - 1
 
@@ -33,6 +35,8 @@ function App() {
       }),
     )
   })
+  //setMaze()
+  console.log(maze)
 
   const exitPosition = useMemo<Coordinate>(
     () => ({
@@ -61,6 +65,18 @@ function App() {
           delta = { row: 0, col: -1 }
           break
         case 'ArrowRight':
+          delta = { row: 0, col: 1 }
+          break
+        case 'w':
+          delta = { row: -1, col: 0 }
+          break
+        case 's':
+          delta = { row: 1, col: 0 }
+          break
+        case 'a':
+          delta = { row: 0, col: -1 }
+          break
+        case 'd':
           delta = { row: 0, col: 1 }
           break
         default:
