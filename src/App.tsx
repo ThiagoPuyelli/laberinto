@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import laberinto from './laberintos/2.json'
 import './App.css'
 import Maze from './components/Maze'
-import {
-  agregarTrampas,
-  generarLaberintoKruskalSimple,
-} from './generators/GenerarLaberinto'
+//import {
+//  agregarTrampas,
+//  generarLaberintoKruskalSimple,
+//} from './generators/GenerarLaberinto'
 
 type MazeCell = 0 | 1 | 2 | 3 | 4 | 5
 
@@ -18,22 +18,22 @@ const START_POSITION: Coordinate = { row: 1, col: 0 }
 
 function App() {
   const [maze] = useState<MazeCell[][]>(() => {
-    //return laberinto.laberinto as MazeCell[][]
-    const generated = agregarTrampas(generarLaberintoKruskalSimple(30, 15), 0.4)
-    const exitRow = generated.length - 2
-    const exitCol = generated[0].length - 1
-
-    return generated.map((row, rowIndex) =>
-      row.map((cell, colIndex) => {
-        if (
-          (rowIndex === START_POSITION.row && colIndex === START_POSITION.col) ||
-          (rowIndex === exitRow && colIndex === exitCol)
-        ) {
-          return 0
-        }
-        return cell as MazeCell
-      }),
-    )
+    return laberinto.laberinto as MazeCell[][]
+    //const generated = agregarTrampas(generarLaberintoKruskalSimple(30, 15), 0.4)
+    //const exitRow = generated.length - 2
+    //const exitCol = generated[0].length - 1
+//
+    //return generated.map((row, rowIndex) =>
+    //  row.map((cell, colIndex) => {
+    //    if (
+    //      (rowIndex === START_POSITION.row && colIndex === START_POSITION.col) ||
+    //      (rowIndex === exitRow && colIndex === exitCol)
+    //    ) {
+    //      return 0
+    //    }
+    //    return cell as MazeCell
+    //  }),
+    //)
   })
   //setMaze()
   console.log(maze)
