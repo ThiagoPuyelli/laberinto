@@ -11,7 +11,6 @@ const CELL_CODE_TO_CLASS: Record<MazeCell, string> = {
   3: 'maze-cell--player',
   4: 'maze-cell--exit',
   5: 'maze-cell--index',
-  6: 'maze-cell--solution',
 }
 
 export default function Maze({ grid }: MazeProps) {
