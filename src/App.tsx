@@ -7,7 +7,7 @@ import Maze from './components/Maze'
 //  generarLaberintoKruskalSimple,
 //} from './generators/GenerarLaberinto'
 
-type MazeCell = 0 | 1 | 2 | 3 | 4 | 5
+type MazeCell = 0 | 1 | 2 | 3 | 4 | 5 | 6
 
 type Coordinate = {
   row: number
@@ -15,6 +15,64 @@ type Coordinate = {
 }
 
 const START_POSITION: Coordinate = { row: 1, col: 0 }
+
+/**
+ * Encuentra el camino más corto entre dos puntos usando BFS
+ */
+function encontrarCamino(
+  maze: MazeCell[][],
+  start: Coordinate,
+  exit: Coordinate
+): Coordinate[] {
+  const rows = maze.length
+  const cols = maze[0].length
+  const visited = Array.from({ length: rows }, () => Array(cols).fill(false))
+  const prev = Array.from({ length: rows }, () => Array(cols).fill<Coordinate | null>(null))
+
+  const queue: Coordinate[] = [start]
+  visited[start.row][start.col] = true
+
+  const dirs = [
+    { row: -1, col: 0 },
+    { row: 1, col: 0 },
+    { row: 0, col: -1 },
+    { row: 0, col: 1 },
+  ]
+
+  while (queue.length > 0) {
+    const current = queue.shift()!
+    if (current.row === exit.row && current.col === exit.col) break
+
+    for (const d of dirs) {
+      const nr = current.row + d.row
+      const nc = current.col + d.col
+
+      if (
+        nr >= 0 &&
+        nr < rows &&
+        nc >= 0 &&
+        nc < cols &&
+        !visited[nr][nc] &&
+        maze[nr][nc] !== 1 && // no pared
+        maze[nr][nc] !== 2    // no trampa
+      ) {
+        visited[nr][nc] = true
+        prev[nr][nc] = current
+        queue.push({ row: nr, col: nc })
+      }
+    }
+  }
+
+  // reconstruir el camino si existe
+  const path: Coordinate[] = []
+  let curr: Coordinate | null = exit
+  while (curr) {
+    path.push(curr)
+    curr = prev[curr.row][curr.col]
+  }
+
+  return path.reverse()
+}
 
 function App() {
   const [maze] = useState<MazeCell[][]>(() => {
@@ -46,9 +104,10 @@ function App() {
     [maze],
   )
 
-  const [playerPosition, setPlayerPosition] = useState<Coordinate>(
-    START_POSITION,
-  )
+  const [playerPosition, setPlayerPosition] = useState<Coordinate>(START_POSITION)
+  const solutionPath = useMemo(() => {
+    return encontrarCamino(maze, START_POSITION, exitPosition)
+  }, [maze, exitPosition])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -123,10 +182,13 @@ function App() {
         if (rowIndex === exitPosition.row && colIndex === exitPosition.col) {
           return 4
         }
+        if (solutionPath.some(p => p.row === rowIndex && p.col === colIndex)) {
+          return 6
+        }
         return cell
       }),
     )
-  }, [maze, playerPosition, exitPosition])
+  }, [maze, playerPosition, exitPosition, solutionPath])
 
   return (
     <main className="app">
