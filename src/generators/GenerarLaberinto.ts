@@ -98,5 +98,7 @@ export function agregarTrampas(laberinto: any[][], proporcion = 0.1, inicio = [1
     }
   }
 
+  laberinto[1][0] = 0
+
   return laberinto;
 }
