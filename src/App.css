@@ -57,8 +57,8 @@ body {
 }
 
 .maze-cell--trap {
-  background:#181818;
   background: #c62828;
+  background:#181818;
   color: white;
 }
 
@@ -84,9 +84,4 @@ body {
 .maze-cell__symbol {
   font-size: 0.8rem;
   letter-spacing: 0.04em;
-}
-
-.maze-cell--solution {
-  background-color: rgb(16, 226, 241);
-  color: white;
 }

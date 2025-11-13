@@ -1,13 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import laberinto from './laberintos/2.json'
 import './App.css'
 import Maze from './components/Maze'
-//import {
-//  agregarTrampas,
-//  generarLaberintoKruskalSimple,
-//} from './generators/GenerarLaberinto'
+import { agregarTrampas, generarLaberintoKruskalSimple } from './generators/GenerarLaberinto'
 
-type MazeCell = 0 | 1 | 2 | 3 | 4 | 5 | 6
+const laberintos = import.meta.glob('./laberintos/*.json', { eager: true })
+
+type MazeCell = 0 | 1 | 2 | 3 | 4 | 5
 
 type Coordinate = {
   row: number
@@ -16,85 +14,33 @@ type Coordinate = {
 
 const START_POSITION: Coordinate = { row: 1, col: 0 }
 
-/**
- * Encuentra el camino más corto entre dos puntos usando BFS
- */
-function encontrarCamino(
-  maze: MazeCell[][],
-  start: Coordinate,
-  exit: Coordinate
-): Coordinate[] {
-  const rows = maze.length
-  const cols = maze[0].length
-  const visited = Array.from({ length: rows }, () => Array(cols).fill(false))
-  const prev = Array.from({ length: rows }, () => Array(cols).fill<Coordinate | null>(null))
-
-  const queue: Coordinate[] = [start]
-  visited[start.row][start.col] = true
-
-  const dirs = [
-    { row: -1, col: 0 },
-    { row: 1, col: 0 },
-    { row: 0, col: -1 },
-    { row: 0, col: 1 },
-  ]
-
-  while (queue.length > 0) {
-    const current = queue.shift()!
-    if (current.row === exit.row && current.col === exit.col) break
-
-    for (const d of dirs) {
-      const nr = current.row + d.row
-      const nc = current.col + d.col
-
-      if (
-        nr >= 0 &&
-        nr < rows &&
-        nc >= 0 &&
-        nc < cols &&
-        !visited[nr][nc] &&
-        maze[nr][nc] !== 1 && // no pared
-        maze[nr][nc] !== 2    // no trampa
-      ) {
-        visited[nr][nc] = true
-        prev[nr][nc] = current
-        queue.push({ row: nr, col: nc })
-      }
-    }
-  }
-
-  // reconstruir el camino si existe
-  const path: Coordinate[] = []
-  let curr: Coordinate | null = exit
-  while (curr) {
-    path.push(curr)
-    curr = prev[curr.row][curr.col]
-  }
-
-  return path.reverse()
-}
-
 function App() {
-  const [maze] = useState<MazeCell[][]>(() => {
-    return laberinto.laberinto as MazeCell[][]
-    //const generated = agregarTrampas(generarLaberintoKruskalSimple(30, 15), 0.4)
-    //const exitRow = generated.length - 2
-    //const exitCol = generated[0].length - 1
-//
-    //return generated.map((row, rowIndex) =>
-    //  row.map((cell, colIndex) => {
-    //    if (
-    //      (rowIndex === START_POSITION.row && colIndex === START_POSITION.col) ||
-    //      (rowIndex === exitRow && colIndex === exitCol)
-    //    ) {
-    //      return 0
-    //    }
-    //    return cell as MazeCell
-    //  }),
-    //)
+  const todosJSON = Object.values(laberintos) as { laberinto: MazeCell[][] }[]
+  const randomMaze = agregarTrampas(generarLaberintoKruskalSimple(30, 15), 0.4)
+  const todos = [...todosJSON, { laberinto: randomMaze }]
+
+  const [indice, setIndice] = useState(0)
+  const [maze, setMaze] = useState<MazeCell[][]>(() => {
+    return todos[indice]?.laberinto || []
   })
-  //setMaze()
-  console.log(maze)
+
+  useEffect(() => {
+    if (todos[indice]) {
+      setMaze(todos[indice].laberinto)
+      indice < todos.length -1 ? console.log(`Laberinto ${indice+1}`) : console.log("Laberinto aleatorio")
+    }
+  }, [indice])
+
+  const cambiarLaberinto = () => {
+    setIndice((prev) => (prev + 1) % todos.length)
+    setPlayerPosition(START_POSITION)
+  }
+
+  useEffect(() => {
+    // @ts-ignore
+    window.cambiarLaberinto = cambiarLaberinto
+    console.log('window.cambiarLaberinto() cambia el laberinto precargado')
+  }, [])
 
   const exitPosition = useMemo<Coordinate>(
     () => ({
@@ -104,37 +50,34 @@ function App() {
     [maze],
   )
 
-  const [playerPosition, setPlayerPosition] = useState<Coordinate>(START_POSITION)
-  const solutionPath = useMemo(() => {
-    return encontrarCamino(maze, START_POSITION, exitPosition)
-  }, [maze, exitPosition])
+  const [playerPosition, setPlayerPosition] = useState<Coordinate>(
+    START_POSITION,
+  )
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
 
+      if (event.ctrlKey && event.altKey && event.code === 'Space') {
+        event.preventDefault()
+        cambiarLaberinto()
+        return
+      }
+
       let delta: Coordinate | null = null
       switch (event.key) {
         case 'ArrowUp':
-          delta = { row: -1, col: 0 }
-          break
-        case 'ArrowDown':
-          delta = { row: 1, col: 0 }
-          break
-        case 'ArrowLeft':
-          delta = { row: 0, col: -1 }
-          break
-        case 'ArrowRight':
-          delta = { row: 0, col: 1 }
-          break
         case 'w':
           delta = { row: -1, col: 0 }
           break
+        case 'ArrowDown':
         case 's':
           delta = { row: 1, col: 0 }
           break
+        case 'ArrowLeft':
         case 'a':
           delta = { row: 0, col: -1 }
           break
+        case 'ArrowRight':
         case 'd':
           delta = { row: 0, col: 1 }
           break
@@ -182,13 +125,10 @@ function App() {
         if (rowIndex === exitPosition.row && colIndex === exitPosition.col) {
           return 4
         }
-        if (solutionPath.some(p => p.row === rowIndex && p.col === colIndex)) {
-          return 6
-        }
         return cell
       }),
     )
-  }, [maze, playerPosition, exitPosition, solutionPath])
+  }, [maze, playerPosition, exitPosition])
 
   return (
     <main className="app">
