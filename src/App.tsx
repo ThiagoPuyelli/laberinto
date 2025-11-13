@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 import Maze from './components/Maze'
+import WinDetector from './components/WinDetector'
 import { agregarTrampas, generarLaberintoKruskalSimple } from './generators/GenerarLaberinto'
 
 const laberintos = import.meta.glob('./laberintos/*.json', { eager: true })
@@ -19,7 +20,7 @@ function App() {
   const randomMaze = agregarTrampas(generarLaberintoKruskalSimple(30, 15), 0.4)
   const todos = [...todosJSON, { laberinto: randomMaze }]
 
-  const [indice, setIndice] = useState(0)
+  const [indice, setIndice] = useState(1)
   const [maze, setMaze] = useState<MazeCell[][]>(() => {
     return todos[indice]?.laberinto || []
   })
@@ -131,9 +132,11 @@ function App() {
   }, [maze, playerPosition, exitPosition])
 
   return (
-    <main className="app">
+    <main className="app" style={{ position: 'relative' }}>
       <Maze grid={renderedMaze} />
+      <WinDetector playerPosition={playerPosition} exitPosition={exitPosition} />
     </main>
+
   )
 }
 
